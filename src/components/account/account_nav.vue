@@ -18,10 +18,10 @@
 <script>
 import top from '@/components/top.vue'
 export default {
-    name: 'account_nav',
-    components: {
-      top
-    }
+  name: 'account_nav',
+  components: {
+    top
+  }
 }
 </script>
 <style>

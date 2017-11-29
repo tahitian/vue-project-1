@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import demo from '@/components/demo'
 import top from '@/components/top.vue'
 import account from '@/components/account/account_nav.vue'
+import account_basic_info from '@/components/account/account_basic_info.vue'
 
 Vue.use(Router)
 
@@ -23,7 +24,13 @@ export default new Router({
     {
       path: '/account',
       name: 'account',
-      component: account
+      component: account,
+      children: [
+        {
+          path: 'basicinfo',
+          component: account_basic_info
+        }
+      ]
     }
   ]
 })
