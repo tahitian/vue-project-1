@@ -1,6 +1,7 @@
 <template>
-  <div class="fr" style="background-color: green; height:100px; width: 100px; line-height: 100px; font-size:0">
-    <div class="vertical-center" style="width: 40px; height: 40px; background-color: red" />
+  <div id="demo">
+    <div></div>
+    <div></div>
   </div>
 </template>
 
@@ -19,7 +20,7 @@ export default {
   margin: 0;
   padding: 0;
 }
-.clearfix {
+/*.clearfix {
     zoom: 1;
 }
 .clearfix:after {
@@ -32,8 +33,12 @@ export default {
 .vertical-center {
   display: inline-block;
   vertical-align: middle;
-}
-.fr {
-  float: right;
+}*/
+
+#demo>div {
+  display: inline-block;
+  height: 100px;
+  width: 100px;
+  background-color: green;
 }
 </style>
