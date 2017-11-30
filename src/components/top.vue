@@ -19,7 +19,7 @@
 
       <div class="wrapper-36 vertical-center mr-7 cp top-unit">
         <img src="../assets/icons/home/portrait.png" class="vertical-center">
-        <span class="w3 white px-16 vertical-center ml-8">{{account_name}}</span>
+        <span class="w3 white px-14 vertical-center ml-8">{{account_name}}</span>
         <img src="../assets/icons/home/drop_down.png" class="vertical-center ml-8">
       </div>
 
@@ -35,7 +35,7 @@
       <div class="vertical-line vertical-center mr-7"></div>
 
       <div class="wrapper-30 vertical-center mr-15 cp top-unit">
-        <span class="w3 white px-16 vertical-center mr-7">获取帮助</span>
+        <span class="w3 white px-14 vertical-center mr-7">获取帮助</span>
         <a href="#" class="vertical-center">
           <img src="../assets/icons/home/help.png" class="w-24">
         </a>
@@ -112,8 +112,8 @@ export default {
 .white {
   color: #ffffff;
 }
-.px-16 {
-  font-size: 16px;
+.px-14 {
+  font-size: 14px;
 }
 .fr {
   float: right;

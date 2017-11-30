@@ -1,18 +1,18 @@
 <template>
-  <div id="basic-info" >
-    Hello World!
+  <div id="qual-info" >
+    账户资质
   </div>
 </template>
 
 <script type="text/javascript">
 export default {
-  name: 'account_basic_info'
+  name: 'account_qual_info'
 }
 </script>
 
 <style type="text/css">
-#basic-info {
+#qual-info {
   /*background-color: #e9eaeb;*/
-  background-color: green;
+  background-color: white;
 }
 </style>
