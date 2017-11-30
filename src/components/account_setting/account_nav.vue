@@ -19,9 +19,9 @@
 import top from '@/components/top.vue'
 export default {
   name: 'account_nav',
-  mounted() {
+  mounted () {
   },
-  data() {
+  data () {
     return {
     }
   },
@@ -31,8 +31,8 @@ export default {
   watch: {
   },
   methods: {
-    check_path(path) {
-      return this.$route.name == path;
+    check_path (path) {
+      return this.$route.name === path
     }
   }
 }

@@ -3,7 +3,7 @@ import Router from 'vue-router'
 // import HelloWorld from '@/components/HelloWorld'
 import demo from '@/components/demo'
 import top from '@/components/top.vue'
-import account from '@/components/account/account_nav.vue'
+import account_setting from '@/components/account_setting/account_nav.vue'
 import account_basic_info from '@/components/account_setting/account_basic_info.vue'
 import account_qual_info from '@/components/account_setting/account_qual_info.vue'
 import account_pwd_reset from '@/components/account_setting/account_pwd_reset.vue'
@@ -24,9 +24,9 @@ export default new Router({
       component: demo
     },
     {
-      path: '/account',
-      name: 'account',
-      component: account,
+      path: '/account-setting',
+      name: 'account_setting',
+      component: account_setting,
       redirect: { name: 'account_basic_info' },
       children: [
         {
