@@ -1,7 +1,9 @@
 <template>
   <div id="demo">
-    <div></div>
-    <div></div>
+    <div>
+      hello
+    </div>
+    <DatePicker type="datetime"   placement="bottom-end" placeholder="开始日期" style="height: 100px; width: 1000px;"></DatePicker>
   </div>
 </template>
 
@@ -36,9 +38,10 @@ export default {
 }*/
 
 #demo>div {
-  display: inline-block;
-  height: 100px;
-  width: 100px;
+  height:20px;
+  background-color: green;
+}
+#demo>p {
   background-color: green;
 }
 </style>
