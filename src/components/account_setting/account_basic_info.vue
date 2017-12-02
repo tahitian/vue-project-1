@@ -19,25 +19,25 @@
           <div class="label-container">
             <label for="advertiser-name">广告主名</label>
           </div>
-          <input type="text" name="advertiser_name" id="advertiser-name" v-model="advertiser_name"></input>
+          <input type="text" name="basic_info.advertiser_name" id="advertiser-name" v-model="basic_info.advertiser_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-name">公司名称</label>
           </div>         
-          <input type="text" name="company_name" id="company-name" v-model="company_name"></input>
+          <input type="text" name="company_name" id="company-name" v-model="basic_info.company_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-num">公司电话</label>
           </div>
-          <input type="text" name="company_num" id="company-num" v-model="company_num"></input>
+          <input type="text" name="company_num" id="company-num" v-model="basic_info.company_num"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-addr">公司地址</label>
           </div>
-          <input type="text" name="company_addr" id="company-addr" v-model="company_addr"></input>
+          <input type="text" name="company_addr" id="company-addr" v-model="basic_info.company_addr"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -51,7 +51,7 @@
           <div class="label-container">
             <label for="advertiser-name">营业执照编号</label>
           </div>
-          <input type="text" name="lisence_num" id="lisence-num" v-model="lisence_num"></input>
+          <input type="text" name="lisence_num" id="lisence-num" v-model="basic_info.lisence_num"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -74,19 +74,19 @@
           <div class="label-container">
             <label for="contact-name">联系人姓名</label>
           </div>
-          <input type="text" name="contact_name" id="contact-name" v-model="contact_name"></input>
+          <input type="text" name="contact_name" id="contact-name" v-model="basic_info.contact_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-num">联系人电话</label>
           </div>         
-          <input type="text" name="contact_num" id="contact-num" v-model="contact_num"></input>
+          <input type="text" name="contact_num" id="contact-num" v-model="basic_info.contact_num"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-email">联系人邮箱</label>
           </div>
-          <input type="text" name="contact_email" id="contact-email" v-model="contact_email"></input>
+          <input type="text" name="contact_email" id="contact-email" v-model="basic_info.contact_email"></input>
         </div>
       </div>
 
@@ -96,20 +96,17 @@
 </template>
 
 <script type="text/javascript">
+
+import {ajaxCallPromise} from '@/components/public/index'
+
 export default {
   name: 'account_basic_info',
+  mounted () {
+    this.getBasicInfo();
+  },
   data () {
     return {
       audit_message: '用户信息通过审核',
-      advertiser_name: '周文',
-      company_name: '周文',
-      company_num: '周文',
-      company_addr: '周文',
-      lisence_type: '周文',
-      lisence_num: '周文',
-      contact_name: '周文',
-      contact_num: '周文',
-      contact_email: '周文',
       ls_type_set: [
         '大陆个体工商类客户',
         '大陆企业单位类客户',
@@ -121,7 +118,35 @@ export default {
         '香港主体类客户',
         '台湾主体类客户',
         '澳门主体类客户'
-      ]
+      ],
+      basic_info: {
+        advertiser_name: '周文 ',
+        company_name: '周文',
+        company_num: '周文',
+        company_addr: '周文',
+        lisence_type: '周文',
+        lisence_num: '周文',
+        contact_name: '周文',
+        contact_num: '周文',
+        contact_email: '周文',
+      },
+      res: {}
+    }
+  },
+  methods: {
+    getBasicInfo(){
+      let param = {
+        sinterface: {
+          method: 'POST',
+          path: 'http://172.16.1.180:6188/v3/settings/account/info/view'
+        }
+      };
+
+      let _self = this;
+
+      ajaxCallPromise(param).then(res => {
+        _self.res = res;
+      })
     }
   }
 }
