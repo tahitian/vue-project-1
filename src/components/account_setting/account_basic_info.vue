@@ -19,7 +19,7 @@
           <div class="label-container">
             <label for="advertiser-name">广告主名</label>
           </div>
-          <input type="text" name="basic_info.advertiser_name" id="advertiser-name" v-model="basic_info.advertiser_name"></input>
+          <input type="text" name="basic_info.user_name" id="advertiser-name" v-model="basic_info.user_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -31,19 +31,19 @@
           <div class="label-container">
             <label for="company-num">公司电话</label>
           </div>
-          <input type="text" name="company_num" id="company-num" v-model="basic_info.company_num"></input>
+          <input type="text" name="telephone" id="company-num" v-model="basic_info.telephone"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-addr">公司地址</label>
           </div>
-          <input type="text" name="company_addr" id="company-addr" v-model="basic_info.company_addr"></input>
+          <input type="text" name="address" id="company-addr" v-model="basic_info.address"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="advertiser-name">营业执照类型</label>
           </div>
-          <select name="lisence_type" >
+          <select name="qualification_type" >
             <option v-for="ls_type in ls_type_set">{{ls_type}}</option>
           </select>
         </div>
@@ -51,13 +51,13 @@
           <div class="label-container">
             <label for="advertiser-name">营业执照编号</label>
           </div>
-          <input type="text" name="lisence_num" id="lisence-num" v-model="basic_info.lisence_num"></input>
+          <input type="text" name="license_number" id="lisence-num" v-model="basic_info.license_number"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="">营业执照有效期</label>
           </div>
-          <DatePicker type="daterange" class="date-picker">
+          <DatePicker type="daterange" class="date-picker" v-model="validity_period">
           </DatePicker>
         </div>
         <div class="input-unit">
@@ -74,23 +74,23 @@
           <div class="label-container">
             <label for="contact-name">联系人姓名</label>
           </div>
-          <input type="text" name="contact_name" id="contact-name" v-model="basic_info.contact_name"></input>
+          <input type="text" name="contacts_name" id="contact-name" v-model="basic_info.contacts_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-num">联系人电话</label>
           </div>         
-          <input type="text" name="contact_num" id="contact-num" v-model="basic_info.contact_num"></input>
+          <input type="text" name="contacts_mobile" id="contact-num" v-model="basic_info.contacts_mobile"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-email">联系人邮箱</label>
           </div>
-          <input type="text" name="contact_email" id="contact-email" v-model="basic_info.contact_email"></input>
+          <input type="text" name="contacts_email" id="contact-email" v-model="basic_info.contacts_email"></input>
         </div>
       </div>
 
-      <input type="submit" value="保存" />
+      <input type="button" value="保存" @click="submitBasicInfo" />
     </form>
   </div>
 </template>
@@ -98,11 +98,16 @@
 <script type="text/javascript">
 
 import {ajaxCallPromise} from '@/components/public/index'
+import '@/components/public/tool'
+import {SERVERCONF,getErrMsg} from '@/components/public/constants'
 
 export default {
   name: 'account_basic_info',
   mounted () {
-    this.getBasicInfo();
+    this.$nextTick(function(){
+      this.getBasicInfo();
+    })
+    
   },
   data () {
     return {
@@ -119,34 +124,74 @@ export default {
         '台湾主体类客户',
         '澳门主体类客户'
       ],
+      validity_period: ['', ''],
       basic_info: {
-        advertiser_name: '周文 ',
-        company_name: '周文',
-        company_num: '周文',
-        company_addr: '周文',
-        lisence_type: '周文',
-        lisence_num: '周文',
-        contact_name: '周文',
-        contact_num: '周文',
-        contact_email: '周文',
+        user_name: ' ',
+        company_name: '',
+        telephone: '',
+        address: '',
+
+        qualification_type: '',
+        license_number: '',
+        company_license: '',
+        license_valid_date_begin: '',
+        license_valid_date_end: '',
+
+        contacts_name: '',
+        contacts_mobile: '',
+        contacts_email: ''
       },
-      res: {}
+    }
+  },
+  watch: {
+    license_valid_date_begin: function(val){
+      console.log(val);
     }
   },
   methods: {
     getBasicInfo(){
+      console.log('1111111111');
       let param = {
         sinterface: {
           method: 'POST',
-          path: 'http://172.16.1.180:6188/v3/settings/account/info/view'
-        }
+          path: '/v3/settings/account/info/view'
+        },
+        data: {}
       };
 
       let _self = this;
 
       ajaxCallPromise(param).then(res => {
-        _self.res = res;
+        _self.basic_info = res;
+        _self.validity_period = [_self.basic_info.license_valid_date_begin, _self.basic_info.license_valid_date_end];
       })
+    },
+    submitBasicInfo(){
+      let data = this.basic_info;
+      data.edit_user_name = data.user_name;
+      let param = {
+        sinterface: {
+          method: 'POST',
+          path: '/v3/settings/account/info/edit'
+        },
+        data
+      }
+      let _self = this;
+      ajaxCallPromise(param).then(res => {
+        _self.getBasicInfo();
+        _self.$Message.info({
+          content: '编辑成功！',
+          duration: 2,
+          closable: true
+        })
+      }).catch(err=> {
+        let msg = getErrMsg(err);
+        _self.$Message.error({
+            content: msg,
+            duration: 2,
+            closable:true
+        });        
+      });
     }
   }
 }
@@ -212,7 +257,6 @@ export default {
 }
 #basic-info .input-unit {
   height: 52px;
-  /*width: 100%;*/
 }
 #basic-info .input-unit>* {
   vertical-align: middle;
@@ -265,7 +309,7 @@ export default {
   height: 443px;
 }
 
-#basic-info input[type="submit"] {
+#basic-info input[type="button"] {
   width: 100px;
   height: 40px;
   font-size: 16px;

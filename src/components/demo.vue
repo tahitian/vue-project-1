@@ -1,47 +1,16 @@
 <template>
-  <div id="demo">
-    <div>
-      hello
-    </div>
-    <DatePicker type="datetime"   placement="bottom-end" placeholder="开始日期" style="height: 100px; width: 1000px;"></DatePicker>
-  </div>
+    <form method="post" enctype="multipart/form-data" action="https://jsonplaceholder.typicode.com/posts/">
+     <div>
+       <label for="file">Choose file to upload</label>
+       <input type="file" id="file" name="file" multiple>
+     </div>
+     <div>
+       <button>Submit</button>
+     </div>
+    </form>
 </template>
-
-<script type="text/javascript">
-export default {
-  data () {
-    return {
-      msg: 'Hello, World!'
+<script>
+    export default {
+        
     }
-  }
-}
 </script>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-}
-/*.clearfix {
-    zoom: 1;
-}
-.clearfix:after {
-    content: '';
-    display: block;
-    clear: both;
-    height: 0;
-    visibility: hidden;
-}
-.vertical-center {
-  display: inline-block;
-  vertical-align: middle;
-}*/
-
-#demo>div {
-  height:20px;
-  background-color: green;
-}
-#demo>p {
-  background-color: green;
-}
-</style>
