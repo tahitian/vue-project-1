@@ -22,8 +22,6 @@ import {ajaxCallPromise} from '@/components/public/index'
 export default {
   name: 'account_nav',
   mounted () {
-    this.$nextTick(function(){
-    })
   },
   data () {
     return {

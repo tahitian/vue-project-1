@@ -3,9 +3,9 @@
 
     <div id="title">
       <span>广告主基本信息</span>
-      <div>
+      <div :class="audit_box_class" v-if="show_audit">
         <span>{{audit_message}}</span>
-        <img src="../../assets/icons/home/close.png" />
+        <img src="../../assets/icons/home/close.png" @click="hideAudit" />
       </div>
     </div>
 
@@ -19,25 +19,25 @@
           <div class="label-container">
             <label for="advertiser-name">广告主名</label>
           </div>
-          <input type="text" name="basic_info.user_name" id="advertiser-name" v-model="basic_info.user_name"></input>
+          <input type="text" id="advertiser-name" v-model="basic_info.user_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-name">公司名称</label>
           </div>         
-          <input type="text" name="company_name" id="company-name" v-model="basic_info.company_name"></input>
+          <input type="text" id="company-name" v-model="basic_info.company_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-num">公司电话</label>
           </div>
-          <input type="text" name="telephone" id="company-num" v-model="basic_info.telephone"></input>
+          <input type="text" id="company-num" v-model="basic_info.telephone"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="company-addr">公司地址</label>
           </div>
-          <input type="text" name="address" id="company-addr" v-model="basic_info.address"></input>
+          <input type="text" id="company-addr" v-model="basic_info.address"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -51,7 +51,7 @@
           <div class="label-container">
             <label for="advertiser-name">营业执照编号</label>
           </div>
-          <input type="text" name="license_number" id="lisence-num" v-model="basic_info.license_number"></input>
+          <input type="text" id="lisence-num" v-model="basic_info.license_number"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -74,19 +74,19 @@
           <div class="label-container">
             <label for="contact-name">联系人姓名</label>
           </div>
-          <input type="text" name="contacts_name" id="contact-name" v-model="basic_info.contacts_name"></input>
+          <input type="text" id="contact-name" v-model="basic_info.contacts_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-num">联系人电话</label>
           </div>         
-          <input type="text" name="contacts_mobile" id="contact-num" v-model="basic_info.contacts_mobile"></input>
+          <input type="text" id="contact-num" v-model="basic_info.contacts_mobile"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="contact-email">联系人邮箱</label>
           </div>
-          <input type="text" name="contacts_email" id="contact-email" v-model="basic_info.contacts_email"></input>
+          <input type="text" id="contact-email" v-model="basic_info.contacts_email"></input>
         </div>
       </div>
 
@@ -104,14 +104,14 @@ import {SERVERCONF,getErrMsg} from '@/components/public/constants'
 export default {
   name: 'account_basic_info',
   mounted () {
-    this.$nextTick(function(){
-      this.getBasicInfo();
-    })
-    
+    this.getBasicInfo();
   },
   data () {
     return {
-      audit_message: '用户信息通过审核',
+      am_list: ['用户信息尚未编辑！为了不影响您正常投放广告，请及时编辑！', '用户信息审核中', '用户信息审核通过', '用户信息审核不通过'],
+      audit_message: '',
+      show_audit: true,
+      audit_box_class: {},
       ls_type_set: [
         '大陆个体工商类客户',
         '大陆企业单位类客户',
@@ -126,7 +126,7 @@ export default {
       ],
       validity_period: ['', ''],
       basic_info: {
-        user_name: ' ',
+        user_name: '',
         company_name: '',
         telephone: '',
         address: '',
@@ -144,13 +144,17 @@ export default {
     }
   },
   watch: {
-    license_valid_date_begin: function(val){
-      console.log(val);
+    validity_period: function(val){
+      if(typeof(val[0]) != 'object') return;
+      this.basic_info.license_valid_date_begin = val[0].format('yyyy-MM-dd hh:mm:ss');
+      this.basic_info.license_valid_date_end = val[1].format('yyyy-MM-dd hh:mm:ss');
     }
   },
   methods: {
+    hideAudit(){
+      this.show_audit = false;
+    },
     getBasicInfo(){
-      console.log('1111111111');
       let param = {
         sinterface: {
           method: 'POST',
@@ -163,11 +167,27 @@ export default {
 
       ajaxCallPromise(param).then(res => {
         _self.basic_info = res;
+
         _self.validity_period = [_self.basic_info.license_valid_date_begin, _self.basic_info.license_valid_date_end];
+
+        if(res.user_audit_status == '未审核'){
+          _self.audit_message = _self.am_list[0];
+          _self.audit_box_class = { 'red-style': true };
+        } else if(res.user_audit_status == '审核中'){
+          _self.audit_message = _self.am_list[1];
+          _self.audit_box_class = { 'yellow-style': true };
+        } else if(res.user_audit_status == '审核通过'){
+          _self.audit_message = _self.am_list[2];
+          _self.audit_box_class = { 'green-style': true };
+        } else if(res.user_audit_status == '审核失败'){
+          _self.audit_message = _self.am_list[3];
+          _self.audit_box_class = { 'red-style': true };
+        }
       })
     },
     submitBasicInfo(){
       let data = this.basic_info;
+
       data.edit_user_name = data.user_name;
       let param = {
         sinterface: {
@@ -180,7 +200,7 @@ export default {
       ajaxCallPromise(param).then(res => {
         _self.getBasicInfo();
         _self.$Message.info({
-          content: '编辑成功！',
+          content: '提交成功！',
           duration: 2,
           closable: true
         })
@@ -221,14 +241,24 @@ export default {
   display: inline-block;
   height: 34px;
   line-height: 34px;
-  background-color: #daecd1;
   vertical-align: middle;
   border-radius: 3px;
   margin-left: 30px;
   padding: 0 14px;
 
   font-size: 0px;
+}
+#basic-info>#title>div.green-style {
+  background-color: #daecd1;
   color: #31780d;
+}
+#basic-info>#title>div.yellow-style {
+  background-color: #f4ecd1;
+  color: #91792a;
+}
+#basic-info>#title>div.red-style {
+  background-color: #f3dfdf;
+  color: #975353;
 }
 #basic-info>#title>div>* {
   vertical-align: middle;
@@ -297,7 +327,7 @@ export default {
   border: 1px solid #ccc;
   height: 30px;
   font-size: 14px;
-  color: #000;
+  /*color: #000;*/
 }
 
 #basic-info div.vertical-line {
@@ -321,5 +351,8 @@ export default {
   right: 20px;
 }
 
+#basic-info input, select {
+  color: #838b97;
+}
 
 </style>

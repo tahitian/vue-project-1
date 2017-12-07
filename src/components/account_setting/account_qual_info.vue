@@ -3,9 +3,9 @@
 
     <div id="title">
       <span>广告主资质信息</span>
-      <div>
+      <div :class="audit_box_class" v-if="show_audit">
         <span>{{audit_message}}</span>
-        <img src="../../assets/icons/home/close.png" />
+        <img src="../../assets/icons/home/close.png" @click="hideAudit" />
       </div>
     </div>
 
@@ -18,43 +18,37 @@
           <div class="label-container">
             <label for="lisence-name">资质名称</label>
           </div>
-          <input type="text" name="lisence_name" id="lisence-name" v-model="lisence_name"></input>
+          <input type="text" id="lisence-name" v-model="qual_info.qualification_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="web-name">主站名</label>
           </div>
-          <input type="text" name="web_name" id="web-name" v-model="web_name"></input>
+          <input type="text" id="web-name" v-model="qual_info.site_name"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="web-url">主站网址</label>
           </div>
-          <input type="text" name="web_url" id="web-url" v-model="web_url"></input>
-        </div>
-        <div class="input-unit">
-          <div class="label-container">
-            <label for="company-addr">公司地址</label>
-          </div>
-          <input type="text" name="company_addr" id="company-addr" v-model="company_addr"></input>
+          <input type="text" id="web-url" v-model="qual_info.site_url"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="industry-cat">行业分类</label>
           </div>
-          <input type="text" name="industry_cat" id="industry-cat" v-model="industry_cat"></input>
+          <input type="text" id="industry-cat" ></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
             <label for="lisence-num">资质编号</label>
           </div>
-          <input type="text" name="lisence_num" id="lisence-num" v-model="lisence_num"></input>
+          <input type="text" id="lisence-num" v-model="qual_info.qualification_number"></input>
         </div>
         <div class="input-unit">
           <div class="label-container">
-            <label for="">营业执照有效期</label>
+            <label for="">资质有效时间</label>
           </div>
-          <DatePicker type="daterange" class="date-picker">
+          <DatePicker type="daterange" class="date-picker" v-model="validity_period">
           </DatePicker>
         </div>
         <div class="input-unit">
@@ -64,27 +58,40 @@
         </div>
       </div>
       
-
-      <input type="submit" value="保存" />
+      <input type="button" value="保存" @click="submitQualInfo" />
     </form>
   </div>
 </template>
 
 <script type="text/javascript">
+import {ajaxCallPromise} from '@/components/public/index'
+import '@/components/public/tool'
+import {SERVERCONF,getErrMsg} from '@/components/public/constants'
+
 export default {
   name: 'account_qual_info',
+  mounted () {
+    this.getQualInfo();
+  },
   data () {
     return {
-      audit_message: '信息审核中，请耐心等待审核结果',
-      advertiser_name: '周文',
-      company_name: '周文',
-      company_num: '周文',
-      company_addr: '周文',
-      lisence_type: '周文',
-      lisence_num: '周文',
-      contact_name: '周文',
-      contact_num: '周文',
-      contact_email: '周文',
+      am_list: ['用户信息尚未编辑！为了不影响您正常投放广告，请及时编辑！', '用户信息审核中', '用户信息审核通过', '用户信息审核不通过'],
+      audit_message: '',
+      show_audit: true,
+      audit_box_class: {},
+
+      qual_info: {
+        qualification_name: '',
+        qualification_number: '',
+        qualification: '',
+        site_name: '',
+        site_url: '',
+        valid_date_begin: '',
+        valid_date_end: '',
+        categories: 0,
+        subcategories: 0
+      },
+      validity_period: ['', ''],
       ls_type_set: [
         '大陆个体工商类客户',
         '大陆企业单位类客户',
@@ -98,6 +105,84 @@ export default {
         '澳门主体类客户'
       ]
     }
+  },
+  watch: {
+    validity_period: function(val){
+      if(typeof(val[0]) != 'object') return;
+      this.qual_info.valid_date_begin = val[0].format('yyyy-MM-dd hh:mm:ss');
+      this.qual_info.valid_date_end = val[1].format('yyyy-MM-dd hh:mm:ss');
+    }
+  },
+  methods: {
+    hideAudit(){
+      this.show_audit = false;
+    },
+    getQualInfo(){
+      let param = {
+        sinterface: {
+          method: 'GET',
+          path: '/v3/settings/account/qinfo/view'
+        },
+        data: {}
+      };
+
+      let _self = this;
+
+      ajaxCallPromise(param).then(res => {
+        _self.show_audit = true;
+        _self.qual_info = res;
+
+        _self.validity_period = [_self.qual_info.valid_date_begin, _self.qual_info.valid_date_end];
+
+        if(res.audit_status == '未审核'){
+          _self.audit_message = _self.am_list[0];
+          _self.audit_box_class = { 'red-style': true };
+        } else if(res.audit_status == '审核中'){
+          _self.audit_message = _self.am_list[1];
+          _self.audit_box_class = { 'yellow-style': true };
+        } else if(res.audit_status == '审核通过'){
+          _self.audit_message = _self.am_list[2];
+          _self.audit_box_class = { 'green-style': true };
+        } else if(res.audit_status == '审核失败'){
+          _self.audit_message = _self.am_list[3];
+          _self.audit_box_class = { 'red-style': true };
+        }
+      }).catch(err=> {
+        let msg = getErrMsg(err);
+        _self.$Message.error({
+            content: msg,
+            duration: 2,
+            closable:true
+        });        
+      });
+    },
+    submitQualInfo(){
+      let data = this.qual_info;
+
+      let param = {
+        sinterface: {
+          method: 'POST',
+          path: '/v3/settings/account/qinfo/edit'
+        },
+        data
+      }
+      let _self = this;
+      ajaxCallPromise(param).then(res => {
+        _self.getQualInfo();
+        _self.$Message.info({
+          content: '提交成功！',
+          duration: 2,
+          closable: true
+        })
+      }).catch(err=> {
+        let msg = getErrMsg(err);
+        _self.$Message.error({
+            content: msg,
+            duration: 2,
+            closable:true
+        });        
+      });
+    }
   }
 }
 </script>
@@ -106,7 +191,7 @@ export default {
 #qual-info {
   background-color: white;
   margin: 20px 70px 0 70px;
-  height: 616px;
+  height: 550px;
   position: relative;
 }
 
@@ -126,14 +211,24 @@ export default {
   display: inline-block;
   height: 34px;
   line-height: 34px;
-  background-color: #f4ecd1;
   vertical-align: middle;
   border-radius: 3px;
   margin-left: 30px;
   padding: 0 14px;
 
   font-size: 0px;
+}
+#qual-info>#title>div.green-style {
+  background-color: #daecd1;
+  color: #31780d;
+}
+#qual-info>#title>div.yellow-style {
+  background-color: #f4ecd1;
   color: #91792a;
+}
+#qual-info>#title>div.red-style {
+  background-color: #f3dfdf;
+  color: #975353;
 }
 #qual-info>#title>div>* {
   vertical-align: middle;
@@ -197,10 +292,10 @@ export default {
   padding-left: 2px;
   border-radius: 3px;
 }
-#basic-info .date-picker {
+#qual-info .date-picker {
   font-size: 14px;
 }
-#basic-info .date-picker input {
+#qual-info .date-picker input {
   display: inline-block;
   border: 1px solid #ccc;
   height: 30px;
@@ -208,7 +303,7 @@ export default {
   color: #000;
 }
 
-#qual-info input[type="submit"] {
+#qual-info input[type="button"] {
   width: 100px;
   height: 40px;
   font-size: 16px;
