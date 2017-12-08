@@ -56,25 +56,23 @@ export default {
     }
 }
 </script> -->
-
 <template>
-  <div>
-    <input v-model="message" v-bind:disabled="isdisabled" placeholder="hello">
-    </input>
-    <p>
-      {{message}}
-    </p>
-  </div>
+    <div>
+      <select v-model="option_value">
+        <option value="1">hello</option>
+        <option value="2">world</option>
+      </select>
+    </div>
 </template>
-
 <script>
+
 export default {
-  name: 'demo',
-  data () {
-    return {
-      message: 'fang',
-      isdisabled: true
+    data () {
+        return {
+            option_value: 1,
+        }
+    },
+    methods: {
     }
-  }
 }
 </script>

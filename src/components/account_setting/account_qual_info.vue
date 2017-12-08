@@ -36,7 +36,17 @@
           <div class="label-container">
             <label for="industry-cat">行业分类</label>
           </div>
-          <input type="text" id="industry-cat" ></input>
+          <select v-model="qual_info.categories">
+            <option v-for="cate in cates" :value="cate.value">{{cate.label}}</option>
+          </select>
+        </div>
+        <div class="input-unit">
+          <div class="label-container">
+            <!-- <label for="industry-cat">行业分类</label> -->
+          </div>
+          <select v-model="qual_info.subcategories">
+            <option v-for="subcate in subcates[cate_index]" :value="subcate.value">{{subcate.label}}</option>
+          </select>
         </div>
         <div class="input-unit">
           <div class="label-container">
@@ -67,6 +77,7 @@
 import {ajaxCallPromise} from '@/components/public/index'
 import '@/components/public/tool'
 import {SERVERCONF,getErrMsg} from '@/components/public/constants'
+import {cate, shis} from '@/components/public/cate'
 
 export default {
   name: 'account_qual_info',
@@ -88,22 +99,17 @@ export default {
         site_url: '',
         valid_date_begin: '',
         valid_date_end: '',
-        categories: 0,
-        subcategories: 0
+        categories: '',
+        subcategories: ''
       },
       validity_period: ['', ''],
-      ls_type_set: [
-        '大陆个体工商类客户',
-        '大陆企业单位类客户',
-        '大陆事业单位类客户',
-        '民办企业类客户',
-        '社会团体类客户',
-        '学校类客户',
-        '国外主体类客户',
-        '香港主体类客户',
-        '台湾主体类客户',
-        '澳门主体类客户'
-      ]
+      cates: cate,
+      subcates: shis,
+      cate_selected: '0',
+      cate_index: 0,
+      subcate_selected: '0',
+      just_loaded: true
+
     }
   },
   watch: {
@@ -111,6 +117,18 @@ export default {
       if(typeof(val[0]) != 'object') return;
       this.qual_info.valid_date_begin = val[0].format('yyyy-MM-dd hh:mm:ss');
       this.qual_info.valid_date_end = val[1].format('yyyy-MM-dd hh:mm:ss');
+    },
+    'qual_info.categories': function(val){
+      for(let i=0; i<this.cates.length; i++){
+        if(this.cates[i].value == val){
+          this.cate_index = i;
+          if(!this.just_loaded){
+            this.qual_info.subcategories = this.subcates[i][0].value;
+          }
+          break;
+        }
+      }
+      this.just_loaded = false;
     }
   },
   methods: {
@@ -130,6 +148,9 @@ export default {
 
       ajaxCallPromise(param).then(res => {
         _self.show_audit = true;
+        _self.just_loaded = true;
+        // _self.cate_selected = '51';
+        // _self.subcate_selected = '5102';
         _self.qual_info = res;
 
         _self.validity_period = [_self.qual_info.valid_date_begin, _self.qual_info.valid_date_end];
@@ -191,7 +212,7 @@ export default {
 #qual-info {
   background-color: white;
   margin: 20px 70px 0 70px;
-  height: 550px;
+  height: 610px;
   position: relative;
 }
 
@@ -300,7 +321,6 @@ export default {
   border: 1px solid #ccc;
   height: 30px;
   font-size: 14px;
-  color: #000;
 }
 
 #qual-info input[type="button"] {
@@ -315,5 +335,7 @@ export default {
   right: 20px;
 }
 
-
+#qual-info input, select {
+  color: #838b97;
+}
 </style>

@@ -43,8 +43,8 @@
           <div class="label-container">
             <label for="advertiser-name">营业执照类型</label>
           </div>
-          <select name="qualification_type" >
-            <option v-for="ls_type in ls_type_set">{{ls_type}}</option>
+          <select name="qualification_type" v-model="basic_info.qualification_type">
+            <option v-for="ls_type in ls_type_set" :value="ls_type[1]">{{ls_type[0]}}</option>
           </select>
         </div>
         <div class="input-unit">
@@ -108,21 +108,27 @@ export default {
   },
   data () {
     return {
-      am_list: ['用户信息尚未编辑！为了不影响您正常投放广告，请及时编辑！', '用户信息审核中', '用户信息审核通过', '用户信息审核不通过'],
+      am_list: [
+        '用户信息尚未编辑！为了不影响您正常投放广告，请及时编辑！', 
+        '用户信息审核中', 
+        '用户信息审核通过', 
+        '用户信息审核不通过'
+      ],
       audit_message: '',
       show_audit: true,
       audit_box_class: {},
       ls_type_set: [
-        '大陆个体工商类客户',
-        '大陆企业单位类客户',
-        '大陆事业单位类客户',
-        '民办企业类客户',
-        '社会团体类客户',
-        '学校类客户',
-        '国外主体类客户',
-        '香港主体类客户',
-        '台湾主体类客户',
-        '澳门主体类客户'
+        ['请选择', 0], 
+        ['大陆个体工商类客户', 1], 
+        ['大陆企业单位类客户', 2], 
+        ['香港主体类客户', 3], 
+        ['台湾主体类客户', 4], 
+        ['澳门主体类客户', 5],
+        ['大陆事业单位类客户', 6], 
+        ['民办企业类客户', 7], 
+        ['社会团体类客户', 8], 
+        ['学校类客户', 9], 
+        ['国外主体类客户', 10]
       ],
       validity_period: ['', ''],
       basic_info: {
@@ -166,6 +172,7 @@ export default {
       let _self = this;
 
       ajaxCallPromise(param).then(res => {
+        _self.show_audit = true;
         _self.basic_info = res;
 
         _self.validity_period = [_self.basic_info.license_valid_date_begin, _self.basic_info.license_valid_date_end];
